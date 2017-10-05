@@ -53,7 +53,9 @@ class WorkOrder < ApplicationRecord
   end
 
   def update_state
-    library_preparation! if sequencing? && flowcells.empty?
+    return unless sequencing? && flowcells.empty?
+    library_preparation!
+    Sequencescape::Api::WorkOrder.update_state(self)
   end
 
   # def maximum_number_of_flowcells
