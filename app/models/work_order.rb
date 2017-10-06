@@ -2,12 +2,12 @@
 
 # WorkOrder
 class WorkOrder < ApplicationRecord
+  include WorkOrderStateMachine
+
   belongs_to :aliquot
   has_one :library
   has_many :events
   has_many :flowcells, inverse_of: :work_order
-
-  enum state: %i[started qc library_preparation sequencing completed]
 
   attr_readonly :sequencescape_id, :library_preparation_type, :data_type,
                 :number_of_flowcells, :study_uuid, :sample_uuid
