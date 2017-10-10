@@ -31,4 +31,9 @@ class SequencingRun < ApplicationRecord
   def flowcells_present?
     flowcells.present?
   end
+
+  def old_work_orders
+    ids = flowcells.map{|f| f.attribute_before_last_save('work_order_id')}
+    WorkOrder.where(id: ids)
+  end
 end

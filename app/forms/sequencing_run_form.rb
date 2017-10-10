@@ -31,6 +31,7 @@ class SequencingRunForm
   def persist_sequencing_run
     ActiveRecord::Base.transaction do
       sequencing_run.save
+      update_old_work_orders
       sequencing_run.reload
       update_work_orders
     end
@@ -72,19 +73,12 @@ class SequencingRunForm
 
   # TODO: code smell. State changes and their consequences should be managed centrally
   # within a workflow.
-  def update_work_orders
-    sequencing_run.work_orders.each do |work_order|
-      if sequencing_run.pending?
-        update_work_order_state(work_order, :sequencing)
-      elsif sequencing_run.completed?
-        update_work_order_state(work_order, :completed)
-      end
-    end
+  def update_old_work_orders
+    sequencing_run.old_work_orders.each(&:to_previous_state)
   end
 
-  def update_work_order_state(work_order, state)
-    work_order.send("#{state}!")
-    Sequencescape::Api::WorkOrder.update_state(work_order)
+  def update_work_orders
+    sequencing_run.work_orders.each(&:to_next_state)
   end
 
   def check_sequencing_run

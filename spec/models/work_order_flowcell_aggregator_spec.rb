@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe WorkOrderFlowcellAggregator, type: :model do
+  include SequencescapeWebmockStubs
+
   let!(:work_orders_with_no_flowcells) do
     create_list(:work_order_for_sequencing, 2,
                 number_of_flowcells: 3)
@@ -40,6 +42,7 @@ RSpec.describe WorkOrderFlowcellAggregator, type: :model do
   end
 
   it 'with existing sequencing run must not count flowcells twice' do
+    stub_updates
     flowcells_a = build_list(:flowcell, 2, work_order: work_orders_with_no_flowcells.first)
     flowcells_b = build_list(:flowcell, 2, work_order: work_orders_with_no_flowcells.last)
     sequencing_run = create(:sequencing_run, flowcells: [flowcells_a, flowcells_b].flatten)

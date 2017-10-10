@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe SequencingRun, type: :model do
+  include SequencescapeWebmockStubs
+
   it 'must have an instrument name' do
     expect(build(:sequencing_run, instrument_name: nil)).to_not be_valid
   end
@@ -23,6 +25,7 @@ RSpec.describe SequencingRun, type: :model do
   end
 
   it 'destroys flowcells if requested' do
+    stub_updates
     sequencing_run = create(:sequencing_run,
                             flowcells_attributes: build_nested_attributes_for(
                               build_attributes_list_for(:flowcell, 3, 'sequencing_run_id') +

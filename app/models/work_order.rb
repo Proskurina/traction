@@ -8,6 +8,8 @@ class WorkOrder < ApplicationRecord
   has_one :library
   has_many :events
   has_many :flowcells, inverse_of: :work_order
+  # should have only one
+  has_many :sequencing_runs, through: :flowcells
 
   attr_readonly :sequencescape_id, :library_preparation_type, :data_type,
                 :number_of_flowcells, :study_uuid, :sample_uuid
@@ -27,11 +29,6 @@ class WorkOrder < ApplicationRecord
   scope :by_date, (-> { order(created_at: :desc) })
 
   before_save :add_event
-  after_touch :back_to_library_preparation, if: :removed_from_sequencing?
-
-  def next_state
-    WorkOrder.states.key(WorkOrder.states[state] + 1)
-  end
 
   def library?
     library.present?
@@ -41,8 +38,8 @@ class WorkOrder < ApplicationRecord
     started? || qc?
   end
 
-  def assign_state(state)
-    assign_attributes(state: WorkOrder.states[state.to_s])
+  def sequencing_run
+    sequencing_runs.first
   end
 
   private
@@ -50,15 +47,6 @@ class WorkOrder < ApplicationRecord
   def add_event
     events.build(state_from: 'none', state_to: state) if new_record?
     events.build(state_from: state_was, state_to: state) if state_changed?
-  end
-
-  def back_to_library_preparation
-    library_preparation!
-    Sequencescape::Api::WorkOrder.update_state(self)
-  end
-
-  def removed_from_sequencing?
-    sequencing? && flowcells.empty?
   end
 
   # def maximum_number_of_flowcells

@@ -11,7 +11,13 @@ class Flowcell < ApplicationRecord
 
   validates_presence_of :flowcell_id, :position
 
+  after_destroy :move_work_order_to_previous_state
+
   def work_order_present?
     work_order.present?
+  end
+
+  def move_work_order_to_previous_state
+    work_order.to_previous_state
   end
 end

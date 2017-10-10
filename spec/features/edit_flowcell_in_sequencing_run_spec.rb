@@ -47,7 +47,6 @@ RSpec.feature 'SequencingRuns', type: :feature do
 
     click_button 'Update Sequencing run'
     expect(page).to have_content('Sequencing run successfully updated')
-
     expect(sequencing_run.work_orders.count).to eq 2
     sequencing_run.work_orders.each do |work_order|
       expect(work_order.state).to eq 'sequencing'
