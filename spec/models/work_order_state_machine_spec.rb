@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe WorkOrder, type: :model do
-
   include SequencescapeWebmockStubs
 
   before(:each) do
@@ -72,5 +71,4 @@ RSpec.describe WorkOrder, type: :model do
     work_order.to_previous_state
     expect(work_order).to be_started
   end
-
 end

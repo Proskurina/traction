@@ -9,15 +9,13 @@ module WorkOrderStateMachine
   end
 
   def to_next_state
-    if next_state.present? && send("ready_for_#{next_state}?")
-      update_state(next_state)
-    end
+    return unless next_state.present? && send("ready_for_#{next_state}?")
+    update_state(next_state)
   end
 
   def to_previous_state
-    if previous_state.present? && send("ready_for_#{previous_state}?")
-      update_state(previous_state)
-    end
+    return unless previous_state.present? && send("ready_for_#{previous_state}?")
+    update_state(previous_state)
   end
 
   def next_state
@@ -64,5 +62,4 @@ module WorkOrderStateMachine
   def ready_for_started?
     !library
   end
-
 end
