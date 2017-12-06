@@ -8,12 +8,12 @@ unless Rails.env.production?
     task create: :environment do |_t|
       pipeline = Pipeline.find_by(name: 'pacbio')
       10.times do |i|
-        aliquot = Aliquot.new(name: "DN4914#{i+1}A:A#{i+1}")
+        aliquot = Aliquot.new(name: "DN4914#{i + 1}A:A#{i + 1}")
         WorkOrder.create!(aliquot: aliquot,
-                  sequencescape_id: i+1,
-                  work_order_requirements_attributes: build_work_order_requirements(pipeline),
-                  sample_uuid: i+1,
-                  study_uuid: i+1)
+                          sequencescape_id: i + 1,
+                          work_order_requirements_attributes: build_work_order_requirements(pipeline),
+                          sample_uuid: i + 1,
+                          study_uuid: i + 1)
         receptacle = Receptacle.new
         # TODO: create(destroy) lab events from one place
         LabEvent.create!(aliquot: aliquot,

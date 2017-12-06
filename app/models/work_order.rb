@@ -24,10 +24,10 @@ class WorkOrder < ApplicationRecord
   end
 
   def self.by_aliquot_next_state(aliquot_next_state, pipeline)
-    unless aliquot_next_state.present?
-      select { |work_order| work_order.pipeline == pipeline }
+    if aliquot_next_state.present?
+      select { |work_order| (work_order.aliquot_next_state == aliquot_next_state.to_s) && (work_order.pipeline == pipeline) } #rubocop:disable all
     else
-      select { |work_order| (work_order.aliquot_next_state == aliquot_next_state.to_s) && (work_order.pipeline == pipeline) }
+      select { |work_order| work_order.pipeline == pipeline }
     end
   end
 
