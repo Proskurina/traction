@@ -13,7 +13,7 @@ class WorkOrder < ApplicationRecord
   accepts_nested_attributes_for :aliquot, :work_order_requirements
 
   delegate :name, :source_plate_barcode, :source_well_position, :action,
-           :short_source_plate_barcode, :receptacle_barcode, :lab_events, to: :aliquot
+           :short_source_plate_barcode, :receptacle_barcode, :lab_events, :pipeline, to: :aliquot
   delegate :state, :next_state, to: :aliquot, prefix: true
 
   scope :by_date, (-> { order(created_at: :desc) })
@@ -23,9 +23,12 @@ class WorkOrder < ApplicationRecord
     select { |work_order| work_order.aliquot_state == aliquot_state.to_s }
   end
 
-  def self.by_aliquot_next_state(aliquot_next_state)
-    return all unless aliquot_next_state.present?
-    select { |work_order| work_order.aliquot_next_state == aliquot_next_state.to_s }
+  def self.by_aliquot_next_state(aliquot_next_state, pipeline)
+    unless aliquot_next_state.present?
+      select { |work_order| work_order.pipeline == pipeline }
+    else
+      select { |work_order| (work_order.aliquot_next_state == aliquot_next_state.to_s) && (work_order.pipeline == pipeline) }
+    end
   end
 
   def unique_name

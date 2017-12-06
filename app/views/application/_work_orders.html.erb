@@ -1,8 +1,8 @@
 <div class="row">
   <div class="col-md-12">
-    <%= form_tag print_jobs_path do %>
+<!-- <%= form_tag print_jobs_path %> -->
       <%= render "print" %>
-      <table class="table table-striped">
+      <table class="table table-striped" >
         <thead>
           <th>Print Label</th>
           <th>Id</th>
@@ -10,6 +10,7 @@
           <th>Action</th>
           <th>State</th>
           <th>Next Step</th>
+          <th>&nbsp;</th>
           <th>&nbsp;</th>
         </thead>
         <tbody>
@@ -22,7 +23,14 @@
               <td><%= work_order.aliquot_state %></td>
               <td>
                 <%if work_order.aliquot_next_state.present?%>
-                  <%= link_to work_order.aliquot_next_state, link_to_next_lab_event_creation(pipeline, work_order) %>
+                  <%unless pipeline.flexible%>
+                    <%= link_to work_order.aliquot_next_state, link_to_next_lab_event_creation(pipeline, work_order) %>
+                  <%else%>
+                    <%= form_tag(link_to_next_lab_event_creation(pipeline, work_order), method: :get, class: "form-inline") do %>
+                      <%= select_tag(:process_step_name, options_from_collection_for_select(pipeline.process_steps, 'name', 'name', work_order.aliquot_next_state), class: "custom-select mb-2 mr-sm-2 mb-sm-0") %> </td>
+                      <td> <%= submit_tag "Start", class: "btn btn-primary" %>
+                    <% end %>
+                  <%end%>
                 <%end%>
               </td>
               <td><%= link_to 'Show', pipeline_work_order_path(pipeline, work_order) %></td>
@@ -30,6 +38,6 @@
           <% end %>
         </tbody>
       </table>
-    <% end %>
+    <!-- <%%> -->
   </div>
 </div>
