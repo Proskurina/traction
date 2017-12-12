@@ -1,0 +1,193 @@
+name: :pacbio
+full_name: 'Pacbio Sequel'
+flexible: true
+requirements:
+  - :insert_size
+  - :sequencing_type
+  - :lanes_of_sequencing_required
+  - :amount_of_data_required
+process_steps:
+  reception:
+    visible: false
+    position: 1
+  qc:
+    visible: true
+    position: 2
+    metadata_fields:
+      concentration_in_ng/microliter:
+        type: :integer
+        required: true
+      fragment_size_in_base_pairs:
+        type: :integer
+        required: true
+      fragment_size_instrument:
+        type: :options
+        required: true
+        options:
+          - :FEMTO_Pulse
+          - :tape_station
+      volume_in_microlitres:
+        type: :integer
+        required: false
+      state:
+        type: :options
+        required: true
+        options:
+          - :fail
+          - :proceed
+      comment:
+        type: :string
+        required: false
+  shearing_and_qc:
+    visible: true
+    position: 3
+    metadata_fields:
+      number_of_passes:
+        type: :integer
+        required: true
+      number_of_runs:
+        type: :integer
+        required: true
+      concentration_in_ng/microliter:
+        type: :integer
+        required: true
+      fragment_size_in_base_pairs:
+        type: :integer
+        required: true
+      fragment_size_instrument:
+        type: :options
+        required: true
+        options:
+          - :FEMTO_Pulse
+          - :tape_station
+      state:
+        type: :options
+        required: true
+        options:
+          - :fail
+          - :proceed
+      comment:
+        type: :string
+        required: false
+  sheared_dna_clean_up_and_qc:
+    visible: true
+    position: 4
+    metadata_fields:
+      volume_in_microlitres:
+        type: :integer
+        required: false
+      concentration_in_ng/microliter:
+        type: :integer
+        required: true
+      DNA_quality_field_260/280:
+        type: :integer
+        required: false
+      DNA_quality_field_260/230:
+        type: :integer
+        required: false
+      total_amount_of_DNA:
+        type: :formula
+        required: false
+      state:
+        type: :options
+        required: true
+        options:
+          - :fail
+          - :proceed
+      comment:
+        type: :string
+        required: false
+  library_creation_and_make_SMRT_bells:
+    visible: true
+    position: 5
+    metadata_fields:
+      library_kit_barcode:
+        type: :string
+        required: false
+      state:
+        type: :options
+        required: true
+        options:
+          - :fail
+          - :proceed
+      comment:
+        type: :string
+        required: false
+  smrt_bell_qc:
+    visible: true
+    position: 6
+    metadata_fields:
+      concentration_in_ng/microliter:
+        type: :integer
+        required: true
+      fragment_size_in_base_pairs:
+        type: :integer
+        required: true
+      fragment_size_instrument:
+        type: :options
+        required: true
+        options:
+          - :FEMTO_Pulse
+          - :tape_station
+      volume_in_microlitres:
+        type: :integer
+        required: true
+      state:
+        type: :options
+        required: true
+        options:
+          - :fail
+          - :proceed
+      comment:
+        type: :string
+        required: false
+  blue_pippin_and_SS_SMRT_bells_clean_up:
+    visible: true
+    position: 7
+    metadata_fields:
+      total_DNA_in_nanograms:
+        type: :string
+        required: false
+      cut_size_in_base_pairs:
+        type: :string
+        required: false
+      state:
+        type: :options
+        options:
+          - :fail
+          - :proceed
+      comment:
+        type: :string
+        required: false
+  damage_repair_and_qc:
+    visible: true
+    position: 8
+    metadata_fields:
+      concentration_in_ng/microliter:
+        type: :integer
+        required: true
+      fragment_size_in_base_pairs:
+        type: :integer
+        required: true
+      fragment_size_instrument:
+        type: :options
+        required: true
+        options:
+          - :FEMTO_Pulse
+          - :tape_station
+      volume_in_microlitres:
+        type: :integer
+        required: true
+      state:
+        type: :options
+        required: true
+        options:
+          - :fail
+          - :proceed
+      comment:
+        type: :string
+        required: false
+  ready_for_sequencing:
+    visible: false
+  sequencing:
+    visible: false
