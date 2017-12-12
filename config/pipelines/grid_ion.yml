@@ -8,8 +8,10 @@ requirements:
 process_steps:
   reception:
     visible: false
+    position: 1
   qc:
     visible: true
+    position: 2
     metadata_fields:
       concentration:
         type: :integer
@@ -25,6 +27,8 @@ process_steps:
           - :proceed_at_risk
           - :proceed
   library_preparation:
+    visible: true
+    position: 3
     metadata_fields:
       volume:
         type: :integer
@@ -37,3 +41,4 @@ process_steps:
         required: false
   sequencing:
     visible: false
+    position: 4
