@@ -12,44 +12,52 @@ class WorkOrder < ApplicationRecord
 
   accepts_nested_attributes_for :aliquot, :work_order_requirements
 
-  delegate :name, :source_plate_barcode, :source_well_position, :action,
-           :short_source_plate_barcode, :receptacle_barcode, :lab_events, :pipeline, to: :aliquot
+  delegate :name, :source_plate_barcode, :source_well_position, :action, :pipeline,
+           :short_source_plate_barcode, :receptacle_barcode, :lab_events, to: :aliquot
+
   delegate :state, :next_state, to: :aliquot, prefix: true
 
   scope :by_date, (-> { order(created_at: :desc) })
 
-  def self.by_aliquot_state(aliquot_state)
-    return all unless aliquot_state.present?
-    select { |work_order| work_order.aliquot_state == aliquot_state.to_s }
+  # returns an array of work_orders in particular state within pipeline
+  def self.by_pipeline_and_aliquot_state(pipeline, aliquot_state = nil)
+    all_work_orders_in_pipeline = work_orders_in_pipeline(pipeline)
+    if aliquot_state.present?
+      all_work_orders_in_pipeline.select { |work_order| work_order.aliquot_state == aliquot_state.to_s }
+    else
+      all_work_orders_in_pipeline
+    end
   end
 
-  def self.by_aliquot_next_state(aliquot_next_state, pipeline)
+  # returns an array of work_orders with particular next state within pipeline
+  def self.by_pipeline_and_aliquot_next_state(pipeline, aliquot_next_state = nil)
+    all_work_orders_in_pipeline = work_orders_in_pipeline(pipeline)
     if aliquot_next_state.present?
-      select { |work_order| (work_order.aliquot_next_state == aliquot_next_state.to_s) && (work_order.pipeline == pipeline) } #rubocop:disable all
+      all_work_orders_in_pipeline.select { |work_order| work_order.aliquot_next_state == aliquot_next_state.to_s }
     else
-      select { |work_order| work_order.pipeline == pipeline }
+      all_work_orders_in_pipeline
     end
+  end
+
+  # returns an array of all work_orders within pipeline
+  def self.work_orders_in_pipeline(pipeline)
+    select { |work_order| work_order.pipeline == pipeline }
   end
 
   def unique_name
     "#{id}:#{name}"
   end
 
+  # this is work_order requirements
+  # they are different for different pipelines
+  # OpenStruct is used to be able to call a method with requirement name
+  # example work_order.details.number_of_flowcells
+  # TODO think about refactoring it
   def details
     @details ||= OpenStruct.new(work_order_requirements.collect(&:to_h).inject(:merge!))
   end
 
   def went_through_step(step_name)
     aliquot.lab_event?(step_name)
-  end
-
-  # TODO: create(destroy) lab events from one place
-
-  def create_sequencing_event(state)
-    aliquot.create_sequencing_event(state)
-  end
-
-  def remove_sequencing_event
-    aliquot.destroy_sequencing_events
   end
 end
